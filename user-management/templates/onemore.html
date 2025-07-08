@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cruise Admin Dashboard - User Drivers</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Custom styles for better aesthetics */
+      body {
+        padding-top: 20px;
+        background-color: #e9ecef; /* Light gray background */
+        font-family: "Inter", sans-serif; /* Use Inter font */
+      }
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px; /* More rounded corners */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+      }
+      h2 {
+        color: #0d6efd; /* Bootstrap primary blue */
+        margin-bottom: 30px;
+        font-weight: 600;
+      }
+      .table-container {
+        margin-top: 30px;
+      }
+      .form-section {
+        margin-top: 40px;
+        border-top: 1px solid #dee2e6; /* Lighter border */
+        padding-top: 30px;
+      }
+      .form-section h3 {
+        margin-bottom: 20px;
+        color: #495057;
+        font-weight: 500;
+      }
+      .btn {
+        border-radius: 8px; /* Rounded buttons */
+      }
+      .modal-content {
+        border-radius: 12px;
+      }
+      .modal-header {
+        background-color: #0d6efd;
+        color: white;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+      }
+      .modal-title {
+        font-weight: 600;
+      }
+      .btn-close {
+        filter: invert(1); /* White close button for dark header */
+      }
+      /* Style for required fields */
+      .form-label.required::after {
+        content: " *";
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="text-center">User Driver Management</h2>
+
+      <div class="table-container">
+        <table
+          id="usersTable"
+          class="table table-striped table-bordered"
+          style="width: 100%"
+        >
+          <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Gender</th>
+              <th>Date of Birth</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <hr class="my-5" />
+
+      <div class="form-section">
+        <h3>Add New User Driver</h3>
+        <form id="addUserForm">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="addFirstName" class="form-label required"
+                >First Name:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="addFirstName"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="addLastName" class="form-label required"
+                >Last Name:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="addLastName"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="addUsername" class="form-label required"
+                >Username:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="addUsername"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="addEmail" class="form-label required">Email:</label>
+              <input type="email" class="form-control" id="addEmail" required />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="addPhone" class="form-label">Phone:</label>
+              <input type="text" class="form-control" id="addPhone" />
+            </div>
+            <div class="col-md-6">
+              <label for="addGender" class="form-label">Gender:</label>
+              <select class="form-select" id="addGender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="addDateOfBirth" class="form-label"
+                >Date of Birth:</label
+              >
+              <input type="date" class="form-control" id="addDateOfBirth" />
+            </div>
+            <div class="col-md-6">
+              <label for="addStatus" class="form-label">Status:</label>
+              <select class="form-select" id="addStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Add User</button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="editUserModal"
+      tabindex="-1"
+      aria-labelledby="editUserModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editUserModalLabel">
+              Edit User Driver
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editUserForm">
+              <input type="hidden" id="editUserId" />
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="editFirstName" class="form-label required"
+                    >First Name:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editFirstName"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editLastName" class="form-label required"
+                    >Last Name:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editLastName"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="editUsername" class="form-label required"
+                    >Username:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editUsername"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editEmail" class="form-label required"
+                    >Email:</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="editEmail"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="editPhone" class="form-label">Phone:</label>
+                  <input type="text" class="form-control" id="editPhone" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editGender" class="form-label">Gender:</label>
+                  <select class="form-select" id="editGender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="editDateOfBirth" class="form-label"
+                    >Date of Birth:</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="editDateOfBirth"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editStatus" class="form-label">Status:</label>
+                  <select class="form-select" id="editStatus">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-success mt-3">
+                Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.dataTables.min.js"></script>
+    <script>
+      const API_URL = "http://localhost:5001/api/users";
+
+      $(document).ready(function () {
+        // Initialize DataTable
+        const table = $("#usersTable").DataTable({
+          responsive: true,
+          pageLength: 10,
+          order: [[0, "asc"]],
+          processing: true,
+          columns: [
+            {
+              title: "First Name",
+              data: null,
+              render: function (data, type, row) {
+                return row[0];
+              },
+            },
+            {
+              title: "Last Name",
+              data: null,
+              render: function (data, type, row) {
+                return row[1];
+              },
+            },
+            {
+              title: "Username",
+              data: null,
+              render: function (data, type, row) {
+                return row[2];
+              },
+            },
+            {
+              title: "Email",
+              data: null,
+              render: function (data, type, row) {
+                return row[3];
+              },
+            },
+            {
+              title: "Phone",
+              data: null,
+              render: function (data, type, row) {
+                return row[4] || "";
+              },
+            },
+            {
+              title: "Gender",
+              data: null,
+              render: function (data, type, row) {
+                return row[5] || "";
+              },
+            },
+            {
+              title: "Date of Birth",
+              data: null,
+              render: function (data, type, row) {
+                return row[6] || "";
+              },
+            },
+            {
+              title: "Status",
+              data: null,
+              render: function (data, type, row) {
+                return row[7] || "active";
+              },
+            },
+            {
+              title: "Actions",
+              data: null,
+              render: function (data, type, row) {
+                const userId = $(row[8]).attr("data-id");
+                return `<button class="btn btn-warning btn-sm edit-btn" data-id="${userId}">Edit</button>
+                       <button class="btn btn-danger btn-sm delete-btn ms-1" data-id="${userId}">Delete</button>`;
+              },
+            },
+          ],
+        });
+
+        // Fetch and load users into table
+        fetchAndLoadUsers();
+
+        // Add new user
+        $("#addUserForm").on("submit", function (event) {
+          event.preventDefault();
+          const formData = {
+            firstName: $("#addFirstName").val().trim(),
+            lastName: $("#addLastName").val().trim(),
+            username: $("#addUsername").val().trim(),
+            email: $("#addEmail").val().trim(),
+            phone: $("#addPhone").val().trim(),
+            gender: $("#addGender").val(),
+            dateOfBirth: $("#addDateOfBirth").val(),
+            status: $("#addStatus").val(),
+          };
+
+          $.ajax({
+            type: "POST",
+            url: API_URL,
+            data: JSON.stringify(formData),
+            contentType: "application/json",
+            success: function (response) {
+              if (response.success) {
+                // Add the new user directly to the table
+                const newRow = [
+                  response.user.firstName,
+                  response.user.lastName,
+                  response.user.username,
+                  response.user.email,
+                  response.user.phone || "",
+                  response.user.gender || "",
+                  response.user.dateOfBirth || "",
+                  response.user.status || "active",
+                  `<button class="btn btn-warning btn-sm edit-btn" data-id="${response.user.id}">Edit</button>
+                   <button class="btn btn-danger btn-sm delete-btn ms-1" data-id="${response.user.id}">Delete</button>`,
+                ];
+                table.row.add(newRow).draw();
+
+                // Reset the form
+                $("#addUserForm")[0].reset();
+                alert("User created successfully!");
+              } else {
+                alert(response.error || "Error creating user");
+              }
+            },
+            error: function (xhr) {
+              const errorMessage = xhr.responseJSON
+                ? xhr.responseJSON.error
+                : "Error creating user";
+              alert(errorMessage);
+              console.error("Error creating user:", xhr.responseJSON);
+            },
+          });
+        });
+
+        // Edit user functionality
+        $("body").on("click", ".edit-btn", function () {
+          const userId = $(this).data("id");
+          $.get(`${API_URL}/${userId}`, function (user) {
+            $("#editUserId").val(user.id);
+            $("#editFirstName").val(user.firstName);
+            $("#editLastName").val(user.lastName);
+            $("#editUsername").val(user.username);
+            $("#editEmail").val(user.email);
+            $("#editPhone").val(user.phone);
+            $("#editGender").val(user.gender);
+            $("#editDateOfBirth").val(user.dateOfBirth);
+            $("#editStatus").val(user.status);
+            $("#editUserModal").modal("show");
+          });
+        });
+
+        // Save edited user
+        $("#editUserForm").on("submit", function (event) {
+          event.preventDefault();
+          const userId = $("#editUserId").val();
+          const formData = {
+            firstName: $("#editFirstName").val().trim(),
+            lastName: $("#editLastName").val().trim(),
+            username: $("#editUsername").val().trim(),
+            email: $("#editEmail").val().trim(),
+            phone: $("#editPhone").val().trim(),
+            gender: $("#editGender").val(),
+            dateOfBirth: $("#editDateOfBirth").val(),
+            status: $("#editStatus").val(),
+          };
+          $.ajax({
+            type: "PUT",
+            url: `${API_URL}/${userId}`,
+            data: JSON.stringify(formData),
+            contentType: "application/json",
+            success: function (response) {
+              if (response.success) {
+                $("#editUserModal").modal("hide");
+                fetchAndLoadUsers();
+              } else {
+                alert(response.error || "Error updating user");
+              }
+            },
+            error: function (xhr) {
+              const errorMessage = xhr.responseJSON
+                ? xhr.responseJSON.error
+                : "Error updating user";
+              alert(errorMessage);
+              console.error("Error updating user:", xhr.responseJSON);
+            },
+          });
+        });
+
+        // Add delete user functionality
+        $("body").on("click", ".delete-btn", function () {
+          if (confirm("Are you sure you want to delete this user?")) {
+            const userId = $(this).data("id");
+            $.ajax({
+              type: "DELETE",
+              url: `${API_URL}/${userId}`,
+              success: function (response) {
+                if (response.success) {
+                  fetchAndLoadUsers();
+                } else {
+                  alert(response.error || "Error deleting user");
+                }
+              },
+              error: function (xhr) {
+                const errorMessage = xhr.responseJSON
+                  ? xhr.responseJSON.error
+                  : "Error deleting user";
+                alert(errorMessage);
+                console.error("Error deleting user:", xhr.responseJSON);
+              },
+            });
+          }
+        });
+      });
+
+      // Fetch all users and load them into the table
+      function fetchAndLoadUsers() {
+        $.get(API_URL, function (response) {
+          if (response && response.data) {
+            const table = $("#usersTable").DataTable();
+            table.clear();
+            response.data.forEach((user) => {
+              const row = [
+                user.firstName,
+                user.lastName,
+                user.username,
+                user.email,
+                user.phone || "",
+                user.gender || "",
+                user.dateOfBirth || "",
+                user.status || "active",
+                `<button class="btn btn-warning btn-sm edit-btn" data-id="${user.id}">Edit</button>
+                 <button class="btn btn-danger btn-sm delete-btn ms-1" data-id="${user.id}">Delete</button>`,
+              ];
+              table.row.add(row);
+            });
+            table.draw();
+          }
+        }).fail(function (error) {
+          console.error("Error fetching users:", error);
+          alert("Error loading users. Please check the console for details.");
+        });
+      }
+    </script>
+  </body>
+</html>
