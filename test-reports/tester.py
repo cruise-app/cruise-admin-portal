@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # MongoDB configuration
-MONGO_URI = "mongodb+srv://Nouryoussri:Nour2003@cluster0.wjrco.mongodb.net/test_reports?retryWrites=true&w=majority"
+MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 db = client.test_reports
 collection = db.test_report
